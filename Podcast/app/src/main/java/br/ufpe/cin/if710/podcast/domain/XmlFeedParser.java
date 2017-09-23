@@ -1,5 +1,7 @@
 package br.ufpe.cin.if710.podcast.domain;
 
+import android.util.Log;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -80,7 +82,6 @@ public class XmlFeedParser {
                 description = readData(parser, "description");
             }
             else if (name.equals("enclosure")) {
-                //TODO implementar resto do metodo para pegar atributo url da tag enclosure
                 downloadLink = readEnclosure(parser);
             }
             else {
@@ -114,8 +115,9 @@ public class XmlFeedParser {
     public static String readEnclosure(XmlPullParser parser)
             throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, "enclosure");
-        String data = "implementar...";
-        parser.require(XmlPullParser.END_TAG, null, "enclosure");
+        String data = parser.getAttributeValue(null, "url");
+        Log.d("PARSER ", data);
+        parser.nextTag();
         return data;
     }
 
