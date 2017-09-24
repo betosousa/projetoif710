@@ -116,7 +116,6 @@ public class XmlFeedParser {
             throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, "enclosure");
         String data = parser.getAttributeValue(null, "url");
-        Log.d("PARSER ", data);
         parser.nextTag();
         return data;
     }
