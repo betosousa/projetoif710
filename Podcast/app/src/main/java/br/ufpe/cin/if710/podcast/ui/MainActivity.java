@@ -73,8 +73,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+
         // atualiza lista com itens ja salvos no BD
-        atualizaLista(getListaPodcasts());
+        new ProviderTask().execute();
 
         new DownloadXmlTask().execute(RSS_FEED);
     }
@@ -139,26 +140,36 @@ public class MainActivity extends Activity {
         }
     }
 
-    private List<ItemFeed> getListaPodcasts(){
-        List<ItemFeed> lista = new ArrayList<>();
-        // recupera a lista de itens salvos no BD atrves do Provider
-        Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
-        if (c != null) {
-            c.moveToFirst();
-            while (c.moveToNext()) {
-                // para cada linha do cursor cria um objeto ItemFeed
-                lista.add(new ItemFeed(
-                                c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
-                        )
-                );
+
+    // AsyncTask para acessar o Provider e recuperar a lista de episodios do BD
+    private class ProviderTask extends AsyncTask<Void, Void, List<ItemFeed>> {
+        @Override
+        protected List<ItemFeed> doInBackground(Void... params) {
+            List<ItemFeed> lista = new ArrayList<>();
+            // recupera a lista de itens salvos no BD atrves do Provider
+            Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
+            if (c != null) {
+                c.moveToFirst();
+                while (c.moveToNext()) {
+                    // para cada linha do cursor cria um objeto ItemFeed
+                    lista.add(new ItemFeed(
+                                    c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
+                                    c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
+                                    c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
+                                    c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
+                                    c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
+                            )
+                    );
+                }
+                c.close();
             }
-            c.close();
+            return lista;
         }
-        return lista;
+        @Override
+        protected void onPostExecute(List<ItemFeed> itemFeeds) {
+            atualizaLista(itemFeeds);
+            Toast.makeText(getApplicationContext(), "itens: " + itemFeeds.size(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void atualizaLista(List<ItemFeed> feed) {
