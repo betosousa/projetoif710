@@ -3,6 +3,7 @@ package br.ufpe.cin.if710.podcast.ui;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         items = (ListView) findViewById(R.id.items);
+        //atualizaLista(getListaPodcasts());
     }
 
     @Override
@@ -63,7 +65,7 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this,SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -93,7 +95,7 @@ public class MainActivity extends Activity {
             List<ItemFeed> itemList = new ArrayList<>();
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
-                for(ItemFeed itemFeed : itemList){
+                for (ItemFeed itemFeed : itemList) {
                     saveItem(itemFeed);
                 }
             } catch (IOException e) {
@@ -107,32 +109,55 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
-
-            //Adapter Personalizado
-            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
-
-            //atualizar o list view
-            items.setAdapter(adapter);
-            items.setTextFilterEnabled(true);
+            atualizaLista(feed);
         }
 
-        private void saveItem(ItemFeed itemFeed){
+        private void saveItem(ItemFeed itemFeed) {
             ContentValues values = new ContentValues();
 
-            values.put(PodcastDBHelper.EPISODE_DATE, getValidString(itemFeed.getPubDate()));
-            values.put(PodcastDBHelper.EPISODE_DESC, getValidString(itemFeed.getDescription()));
-            values.put(PodcastDBHelper.EPISODE_DOWNLOAD_LINK, getValidString(itemFeed.getDownloadLink()));
-            values.put(PodcastDBHelper.EPISODE_LINK, getValidString(itemFeed.getLink()));
-            values.put(PodcastDBHelper.EPISODE_TITLE, getValidString(itemFeed.getTitle()));
-            values.put(PodcastDBHelper.EPISODE_FILE_URI, "");
+            values.put(PodcastProviderContract.DATE, getValidString(itemFeed.getPubDate()));
+            values.put(PodcastProviderContract.DESCRIPTION, getValidString(itemFeed.getDescription()));
+            values.put(PodcastProviderContract.DOWNLOAD_LINK, getValidString(itemFeed.getDownloadLink()));
+            values.put(PodcastProviderContract.EPISODE_LINK, getValidString(itemFeed.getLink()));
+            values.put(PodcastProviderContract.TITLE, getValidString(itemFeed.getTitle()));
+            values.put(PodcastProviderContract.EPISODE_URI, "");
             Uri uri =
-            getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
+                    getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
             Log.d("SAVE_ITEM", "saveItem: " + uri.toString());
         }
 
-        private String getValidString(String str){
+        private String getValidString(String str) {
             return str != null ? str : "";
         }
+    }
+
+    private List<ItemFeed> getListaPodcasts(){
+        List<ItemFeed> lista = new ArrayList<>();
+        Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
+        if (c != null) {
+            c.moveToFirst();
+            while (c.moveToNext()) {
+                lista.add(new ItemFeed(
+                                c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
+                                c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
+                                c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
+                                c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
+                                c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
+                        )
+                );
+            }
+            c.close();
+        }
+        return lista;
+    }
+
+    public void atualizaLista(List<ItemFeed> feed) {
+        //Adapter Personalizado
+        XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+
+        //atualizar o list view
+        items.setAdapter(adapter);
+        items.setTextFilterEnabled(true);
     }
 
     //TODO Opcional - pesquise outros meios de obter arquivos da internet
