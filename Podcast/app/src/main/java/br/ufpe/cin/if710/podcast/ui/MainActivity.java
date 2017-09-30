@@ -47,7 +47,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         items = (ListView) findViewById(R.id.items);
-        atualizaLista(getListaPodcasts());
     }
 
     @Override
@@ -74,6 +73,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        // atualiza lista com itens ja salvos no BD
+        atualizaLista(getListaPodcasts());
+
         new DownloadXmlTask().execute(RSS_FEED);
     }
 
@@ -95,6 +97,7 @@ public class MainActivity extends Activity {
             List<ItemFeed> itemList = new ArrayList<>();
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
+                // salva itens no BD
                 for (ItemFeed itemFeed : itemList) {
                     saveItem(itemFeed);
                 }
@@ -109,23 +112,28 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
+            // atuaiza o adapter com itens baixados
             atualizaLista(feed);
         }
 
         private void saveItem(ItemFeed itemFeed) {
             ContentValues values = new ContentValues();
-
+            // preenche um ContentValues com os dados recuperados no parser
             values.put(PodcastProviderContract.DATE, getValidString(itemFeed.getPubDate()));
             values.put(PodcastProviderContract.DESCRIPTION, getValidString(itemFeed.getDescription()));
             values.put(PodcastProviderContract.DOWNLOAD_LINK, getValidString(itemFeed.getDownloadLink()));
             values.put(PodcastProviderContract.EPISODE_LINK, getValidString(itemFeed.getLink()));
             values.put(PodcastProviderContract.TITLE, getValidString(itemFeed.getTitle()));
+            // como o ep ainda nao foi baixado...
             values.put(PodcastProviderContract.EPISODE_URI, "");
+
+            // salva o item no BD atraves de chamada ao Content Provider
             Uri uri =
                     getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
             Log.d("SAVE_ITEM", "saveItem: " + uri.toString());
         }
 
+        // metodo para validar strings e evitar insercoes de campos nulos no BD
         private String getValidString(String str) {
             return str != null ? str : "";
         }
@@ -133,10 +141,12 @@ public class MainActivity extends Activity {
 
     private List<ItemFeed> getListaPodcasts(){
         List<ItemFeed> lista = new ArrayList<>();
+        // recupera a lista de itens salvos no BD atrves do Provider
         Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
         if (c != null) {
             c.moveToFirst();
             while (c.moveToNext()) {
+                // para cada linha do cursor cria um objeto ItemFeed
                 lista.add(new ItemFeed(
                                 c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
                                 c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
