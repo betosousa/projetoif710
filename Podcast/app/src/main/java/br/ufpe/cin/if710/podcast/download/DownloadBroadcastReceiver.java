@@ -12,6 +12,7 @@ import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 /**
  * Created by Beto on 07/10/2017.
  * Receiver para armazenar a uri do arquivo
+ * Registrado no manifest, recebe broadcasts do DownloadManager executado pelo service
  */
 
 public class DownloadBroadcastReceiver extends BroadcastReceiver {

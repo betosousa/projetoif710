@@ -53,7 +53,7 @@ public class PodcastProviderHelper {
         // salva o downloadID do podcast para recupera o arquivo no fim do download
         contentValues.put(PodcastProviderContract.EPISODE_DOWNLOAD_ID, downloadID);
         // realiza uma query de update no podcast de id passado como argumento
-        int x = context.getContentResolver().update(
+        context.getContentResolver().update(
                 PodcastProviderContract.EPISODE_LIST_URI,
                 contentValues,
                 PodcastProviderContract._ID+"=?",

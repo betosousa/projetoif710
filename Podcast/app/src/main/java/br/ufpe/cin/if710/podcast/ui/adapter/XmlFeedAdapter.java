@@ -20,6 +20,7 @@ import java.util.List;
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
+import br.ufpe.cin.if710.podcast.download.DownloadIntentService;
 import br.ufpe.cin.if710.podcast.ui.EpisodeDetailActivity;
 
 public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
@@ -68,7 +69,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        final ViewHolder holder;
         if (convertView == null) {
             convertView = View.inflate(getContext(), linkResource, null);
             holder = new ViewHolder();
@@ -85,6 +86,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         holder.item_title.setText(itemFeed.getTitle());
         holder.item_date.setText(itemFeed.getPubDate());
 
+        // ajusta o texto do botao de acordo com arquivo baixado ou nao
         if (!itemFeed.getFileURI().isEmpty()) {
             holder.action_button.setText("REP");
         } else {
@@ -96,6 +98,8 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                 if (!itemFeed.getFileURI().isEmpty()) {
                     playAction(itemFeed);
                 } else {
+                    // desativa o botao
+                    holder.action_button.setEnabled(false);
                     downloadAction(itemFeed);
                 }
             }
@@ -115,12 +119,13 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
     void downloadAction(ItemFeed itemFeed){
         Toast.makeText(getContext(),"Baixando podcast", Toast.LENGTH_SHORT).show();
-        // solicita o download manager do sistema para fazer o download do podcast
-        DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        // coloca o download numa fila e recupera seu ID para recuperar o arquivo posteriormente
-        long downloadID = downloadManager.enqueue(new DownloadManager.Request(Uri.parse(itemFeed.getDownloadLink())));
-        // salva o ID no BD
-        PodcastProviderHelper.updateDownloadID(getContext(), itemFeed.getId(), downloadID);
+
+        // cria intent para o service de download
+        Intent intent = new Intent(getContext(), DownloadIntentService.class);
+        // passando o itemfeed como extra
+        intent.putExtra(DownloadIntentService.ITEM_FEED, itemFeed);
+        // chama o intent service para ealizar o download.
+        getContext().startService(intent);
     }
 
     void playAction(ItemFeed itemFeed){
