@@ -28,7 +28,8 @@
             android:exported="true" />
 
         <activity android:name=".ui.EpisodeDetailActivity"></activity>
-        <receiver android:name=".download.DownloadBroadcastReceiver">
+
+        <receiver android:name=".download.BackgroundReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
             </intent-filter>

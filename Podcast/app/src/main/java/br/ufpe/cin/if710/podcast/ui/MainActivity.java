@@ -1,17 +1,17 @@
 package br.ufpe.cin.if710.podcast.ui;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,12 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
-import br.ufpe.cin.if710.podcast.db.PodcastDBHelper;
-import br.ufpe.cin.if710.podcast.db.PodcastProvider;
-import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
+import br.ufpe.cin.if710.podcast.download.BackgroundReceiver;
+import br.ufpe.cin.if710.podcast.download.DownloadBroadcastReceiver;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 public class MainActivity extends Activity {
@@ -41,6 +40,8 @@ public class MainActivity extends Activity {
     //TODO teste com outros links de podcast
 
     private ListView items;
+
+    private ForegroundReceiver foregroundReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,35 @@ public class MainActivity extends Activity {
         adapter.clear();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // cria e registra receiver dinamico para atualizar a tela automaticamente se app em primeiro plano
+        foregroundReceiver = new ForegroundReceiver();
+        registerReceiver(foregroundReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        // desativa receiver estatico que emite as notificacoes
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+    }
+
+    @Override
+    protected void onPause() {
+        // desregistra o receiver
+        unregisterReceiver(foregroundReceiver);
+        // reativa receiver estatico que emite as notificacoes
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+        super.onPause();
+    }
+
+    // ativa ou desativa receiver estatico de Notificacoes
+    private void setEnabledStateReceiver(int enabledState){
+        PackageManager pm = getPackageManager();
+        ComponentName componentName = new ComponentName(getApplicationContext(), BackgroundReceiver.class);
+        pm.setComponentEnabledSetting(componentName,
+                enabledState,
+                PackageManager.DONT_KILL_APP);
+    }
+
     private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
         @Override
         protected void onPreExecute() {
@@ -127,7 +157,6 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(List<ItemFeed> itemFeeds) {
             atualizaLista(itemFeeds);
-            Toast.makeText(getApplicationContext(), "itens: " + itemFeeds.size(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -161,5 +190,13 @@ public class MainActivity extends Activity {
             }
         }
         return rssFeed;
+    }
+
+    public class ForegroundReceiver extends DownloadBroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            super.onReceive(context, intent);
+            new ProviderTask().execute();
+        }
     }
 }
