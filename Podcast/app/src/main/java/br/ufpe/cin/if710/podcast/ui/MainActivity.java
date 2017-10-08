@@ -29,6 +29,7 @@ import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastDBHelper;
 import br.ufpe.cin.if710.podcast.db.PodcastProvider;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
+import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
@@ -99,9 +100,7 @@ public class MainActivity extends Activity {
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
                 // salva itens no BD
-                for (ItemFeed itemFeed : itemList) {
-                    saveItem(itemFeed);
-                }
+                PodcastProviderHelper.saveItens(getApplicationContext(), itemList);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {
@@ -114,29 +113,7 @@ public class MainActivity extends Activity {
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
             // atuaiza o adapter com itens baixados
-            atualizaLista(feed);
-        }
-
-        private void saveItem(ItemFeed itemFeed) {
-            ContentValues values = new ContentValues();
-            // preenche um ContentValues com os dados recuperados no parser
-            values.put(PodcastProviderContract.DATE, getValidString(itemFeed.getPubDate()));
-            values.put(PodcastProviderContract.DESCRIPTION, getValidString(itemFeed.getDescription()));
-            values.put(PodcastProviderContract.DOWNLOAD_LINK, getValidString(itemFeed.getDownloadLink()));
-            values.put(PodcastProviderContract.EPISODE_LINK, getValidString(itemFeed.getLink()));
-            values.put(PodcastProviderContract.TITLE, getValidString(itemFeed.getTitle()));
-            // como o ep ainda nao foi baixado...
-            values.put(PodcastProviderContract.EPISODE_URI, "");
-
-            // salva o item no BD atraves de chamada ao Content Provider
-            Uri uri =
-                    getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
-            Log.d("SAVE_ITEM", "saveItem: " + uri.toString());
-        }
-
-        // metodo para validar strings e evitar insercoes de campos nulos no BD
-        private String getValidString(String str) {
-            return str != null ? str : "";
+            new ProviderTask().execute();
         }
     }
 
@@ -145,25 +122,7 @@ public class MainActivity extends Activity {
     private class ProviderTask extends AsyncTask<Void, Void, List<ItemFeed>> {
         @Override
         protected List<ItemFeed> doInBackground(Void... params) {
-            List<ItemFeed> lista = new ArrayList<>();
-            // recupera a lista de itens salvos no BD atrves do Provider
-            Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
-            if (c != null) {
-                c.moveToFirst();
-                while (c.moveToNext()) {
-                    // para cada linha do cursor cria um objeto ItemFeed
-                    lista.add(new ItemFeed(
-                                    c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
-                                    c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
-                                    c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
-                                    c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
-                                    c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
-                            )
-                    );
-                }
-                c.close();
-            }
-            return lista;
+            return PodcastProviderHelper.getItens(getApplicationContext());
         }
         @Override
         protected void onPostExecute(List<ItemFeed> itemFeeds) {
