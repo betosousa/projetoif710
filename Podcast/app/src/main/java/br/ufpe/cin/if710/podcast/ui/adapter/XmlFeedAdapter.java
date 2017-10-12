@@ -5,9 +5,13 @@ package br.ufpe.cin.if710.podcast.ui.adapter;
  */
 
 import android.app.DownloadManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.IBinder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,17 +25,23 @@ import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.download.DownloadIntentService;
+import br.ufpe.cin.if710.podcast.player.PodcastPlayer;
 import br.ufpe.cin.if710.podcast.ui.EpisodeDetailActivity;
+import br.ufpe.cin.if710.podcast.ui.PlayActivity;
 
 public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
     int linkResource;
     Context context;
 
+    //PodcastPlayer podcastPlayer;
+    //boolean isBound;
+
     public XmlFeedAdapter(Context context, int resource, List<ItemFeed> objects) {
         super(context, resource, objects);
         linkResource = resource;
         this.context = context;
+        //context.startService(new Intent(context, PodcastPlayer.class));
     }
 
     /**
@@ -88,9 +98,9 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
         // ajusta o texto do botao de acordo com arquivo baixado ou nao
         if (!itemFeed.getFileURI().isEmpty()) {
-            holder.action_button.setText("REP");
+            holder.action_button.setText(context.getString(R.string.reproduzir));
         } else {
-            holder.action_button.setText("BAIXAR");
+            holder.action_button.setText(context.getString(R.string.baixar));
         }
         holder.action_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +138,13 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         getContext().startService(intent);
     }
 
-    void playAction(ItemFeed itemFeed){
-        Toast.makeText(getContext(),"Reproduzindo podcast", Toast.LENGTH_SHORT).show();
+    void playAction(ItemFeed itemFeed) {
+        // cria intent para abrir activity que reproduzira o podcast
+        Intent activityIntent = new Intent(getContext(), PlayActivity.class);
+        // passa o titulo e a uri no intent
+        activityIntent.putExtra(PlayActivity.TITLE, itemFeed.getTitle());
+        activityIntent.putExtra(PlayActivity.FILE_URI, itemFeed.getFileURI());
+        // inicia a activity
+        getContext().startActivity(activityIntent);
     }
 }
