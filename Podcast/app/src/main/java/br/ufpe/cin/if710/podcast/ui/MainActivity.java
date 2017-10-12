@@ -10,27 +10,21 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
-import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
 import br.ufpe.cin.if710.podcast.download.BackgroundReceiver;
 import br.ufpe.cin.if710.podcast.download.DownloadBroadcastReceiver;
+import br.ufpe.cin.if710.podcast.download.ItensBackgroundReceiver;
+import br.ufpe.cin.if710.podcast.download.ItensDownloadIntentService;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 public class MainActivity extends Activity {
@@ -42,6 +36,7 @@ public class MainActivity extends Activity {
     private ListView items;
 
     private ForegroundReceiver foregroundReceiver;
+    private ItensForegroundReceiver itensReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,10 +71,14 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
+        // inicia service que atualiza a lista de podcasts
+        Intent intent = new Intent(getApplicationContext(), ItensDownloadIntentService.class);
+        intent.putExtra(ItensDownloadIntentService.DOWNLOAD_URL, RSS_FEED);
+        startService(intent);
+
+
         // atualiza lista com itens ja salvos no BD
         new ProviderTask().execute();
-
-        new DownloadXmlTask().execute(RSS_FEED);
     }
 
     @Override
@@ -96,57 +95,37 @@ public class MainActivity extends Activity {
         foregroundReceiver = new ForegroundReceiver();
         registerReceiver(foregroundReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        // desativa receiver estatico que emite as notificacoes
-        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
+        // cria e registra receiver dinamico para o broadcast de itens atualizados
+        // para atualizar a tela automaticamente se app em primeiro plano
+        itensReceiver = new ItensForegroundReceiver();
+        registerReceiver(itensReceiver, new IntentFilter(ItensDownloadIntentService.ACTION_ITENS_UPDATED));
+
+        // desativa receivers estaticos que emitem as notificacoes
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED, BackgroundReceiver.class);
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_DISABLED, ItensBackgroundReceiver.class);
     }
 
     @Override
     protected void onPause() {
-        // desregistra o receiver
+        // desregistra os receivers
         unregisterReceiver(foregroundReceiver);
-        // reativa receiver estatico que emite as notificacoes
-        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+        unregisterReceiver(itensReceiver);
+
+        // reativa receivers estaticos que emitem as notificacoes
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED, BackgroundReceiver.class);
+        setEnabledStateReceiver(PackageManager.COMPONENT_ENABLED_STATE_ENABLED, ItensBackgroundReceiver.class);
+
         super.onPause();
     }
 
     // ativa ou desativa receiver estatico de Notificacoes
-    private void setEnabledStateReceiver(int enabledState){
+    private void setEnabledStateReceiver(int enabledState, Class receiverClass){
         PackageManager pm = getPackageManager();
-        ComponentName componentName = new ComponentName(getApplicationContext(), BackgroundReceiver.class);
+        ComponentName componentName = new ComponentName(getApplicationContext(), receiverClass);
         pm.setComponentEnabledSetting(componentName,
                 enabledState,
                 PackageManager.DONT_KILL_APP);
     }
-
-    private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
-        @Override
-        protected void onPreExecute() {
-            Toast.makeText(getApplicationContext(), "iniciando...", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected List<ItemFeed> doInBackground(String... params) {
-            List<ItemFeed> itemList = new ArrayList<>();
-            try {
-                itemList = XmlFeedParser.parse(getRssFeed(params[0]));
-                // salva itens no BD
-                PodcastProviderHelper.saveItens(getApplicationContext(), itemList);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
-            return itemList;
-        }
-
-        @Override
-        protected void onPostExecute(List<ItemFeed> feed) {
-            Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
-            // atuaiza o adapter com itens baixados
-            new ProviderTask().execute();
-        }
-    }
-
 
     // AsyncTask para acessar o Provider e recuperar a lista de episodios do BD
     private class ProviderTask extends AsyncTask<Void, Void, List<ItemFeed>> {
@@ -157,6 +136,7 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(List<ItemFeed> itemFeeds) {
             atualizaLista(itemFeeds);
+            Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -169,33 +149,20 @@ public class MainActivity extends Activity {
         items.setTextFilterEnabled(true);
     }
 
-    //TODO Opcional - pesquise outros meios de obter arquivos da internet
-    private String getRssFeed(String feed) throws IOException {
-        InputStream in = null;
-        String rssFeed = "";
-        try {
-            URL url = new URL(feed);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            in = conn.getInputStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int count; (count = in.read(buffer)) != -1; ) {
-                out.write(buffer, 0, count);
-            }
-            byte[] response = out.toByteArray();
-            rssFeed = new String(response, "UTF-8");
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
-        return rssFeed;
-    }
-
+    // Receiver dinamico que atualiza a lista de podcasts ao terminar um download de podcast
     public class ForegroundReceiver extends DownloadBroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             super.onReceive(context, intent);
+            new ProviderTask().execute();
+        }
+    }
+
+    // Receiver dinamico que atualiza a lista de podcasts ao terminar a atualizacao da lista de podcasts
+    public class ItensForegroundReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
             new ProviderTask().execute();
         }
     }

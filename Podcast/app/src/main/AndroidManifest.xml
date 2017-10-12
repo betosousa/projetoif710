@@ -34,8 +34,14 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".download.ItensBackgroundReceiver">
+            <intent-filter>
+                <action android:name="br.ufpe.cin.if710.podcast.ItensUpdated"/>
+            </intent-filter>
+        </receiver>
         <service android:name=".download.DownloadIntentService"/>
         <service android:name=".player.PodcastPlayer"/>
+        <service android:name=".download.ItensDownloadIntentService"/>
     </application>
 
 </manifest>
