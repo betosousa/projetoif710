@@ -101,14 +101,17 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
             holder.action_button.setText(context.getString(R.string.reproduzir));
         } else {
             holder.action_button.setText(context.getString(R.string.baixar));
+            // desativa o botao se ja estiver baixando
+            holder.action_button.setEnabled(itemFeed.getDownloadID() == 0);
         }
+
         holder.action_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!itemFeed.getFileURI().isEmpty()) {
                     playAction(itemFeed);
                 } else {
-                    // desativa o botao
+                    // desativa o botao se ja estiver baixando
                     holder.action_button.setEnabled(false);
                     downloadAction(itemFeed);
                 }
