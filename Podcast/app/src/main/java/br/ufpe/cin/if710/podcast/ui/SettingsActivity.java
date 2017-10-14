@@ -10,6 +10,7 @@ import br.ufpe.cin.if710.podcast.R;
 
 public class SettingsActivity extends Activity {
     public static final String FEED_LINK = "feedlink";
+    public static final String UPDATE_TIME = "updateTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +23,7 @@ public class SettingsActivity extends Activity {
         protected static final String TAG = "FeedPreferenceFragment";
         private SharedPreferences.OnSharedPreferenceChangeListener mListener;
         private Preference feedLinkPref;
+        private Preference updatePref;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -32,12 +34,17 @@ public class SettingsActivity extends Activity {
 
             // pega o valor atual de FeedLink
             feedLinkPref = (Preference) getPreferenceManager().findPreference(FEED_LINK);
+            updatePref = (Preference) getPreferenceManager().findPreference(UPDATE_TIME);
 
             // cria listener para atualizar summary ao modificar link do feed
             mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    feedLinkPref.setSummary(sharedPreferences.getString(FEED_LINK, getActivity().getResources().getString(R.string.feed_link)));
+                    if(key.equals(FEED_LINK)) {
+                        feedLinkPref.setSummary(sharedPreferences.getString(FEED_LINK, getActivity().getResources().getString(R.string.feed_link)));
+                    } else if(key.equals(UPDATE_TIME)){
+                        updatePref.setSummary(sharedPreferences.getString(UPDATE_TIME, getActivity().getResources().getString(R.string.periodic_pref_default)));
+                    }
                 }
             };
 
@@ -49,7 +56,8 @@ public class SettingsActivity extends Activity {
 
             // força chamada ao metodo de callback para exibir link atual
             mListener.onSharedPreferenceChanged(prefs, FEED_LINK);
-
+            // força chamada ao metodo de callback para exibir intervalo atual
+            mListener.onSharedPreferenceChanged(prefs, UPDATE_TIME);
         }
     }
 }

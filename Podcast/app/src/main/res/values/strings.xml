@@ -16,4 +16,8 @@
     <string name="play">PLAY</string>
     <string name="pause">PAUSE</string>
     <string name="stop">STOP</string>
+    <string name="periodic_pref_title">Mudar Intervalo de Atualização</string>
+    <string name="periodic_pref_msg">Digite o novo intervalo (em minutos)</string>
+    <string name="periodic_pref_desc">Intervalo de Atualização</string>
+    <string name="periodic_pref_default">1</string>
 </resources>

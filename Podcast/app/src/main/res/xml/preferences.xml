@@ -11,4 +11,13 @@
         android:title="@string/pref_desc"
         android:defaultValue="@string/feed_link" />
 
+    <EditTextPreference
+        android:dialogTitle="@string/periodic_pref_title"
+        android:dialogMessage="@string/periodic_pref_msg"
+        android:key="updateTime"
+        android:negativeButtonText="@string/cancel"
+        android:positiveButtonText="@string/change"
+        android:title="@string/periodic_pref_desc"
+        android:defaultValue="@string/periodic_pref_default" />
+
 </PreferenceScreen>
