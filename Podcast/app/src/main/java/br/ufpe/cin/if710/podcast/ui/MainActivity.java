@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
     //ao fazer envio da resolucao, use este link no seu codigo!
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
     //TODO teste com outros links de podcast
+    //http://rss.cnn.com/rss/edition.rss
 
     private ListView items;
 
@@ -70,13 +71,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        // inicia service que atualiza a lista de podcasts
-        Intent intent = new Intent(getApplicationContext(), ItensDownloadIntentService.class);
-        intent.putExtra(ItensDownloadIntentService.DOWNLOAD_URL, RSS_FEED);
-        startService(intent);
-
-
         // atualiza lista com itens ja salvos no BD
         new ProviderTask().execute();
     }

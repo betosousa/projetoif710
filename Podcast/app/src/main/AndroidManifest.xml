@@ -42,6 +42,7 @@
         <service android:name=".download.DownloadIntentService"/>
         <service android:name=".player.PodcastPlayer"/>
         <service android:name=".download.ItensDownloadIntentService"/>
+        <service android:name=".jobscheduler.UpdateJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

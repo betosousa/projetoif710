@@ -2,6 +2,7 @@ package br.ufpe.cin.if710.podcast.download;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -30,6 +31,7 @@ public class ItensDownloadIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d("KD scheduler service", "onHandleIntent: ");
         try {
             List<ItemFeed> itemList = XmlFeedParser.parse(getRssFeed(intent.getStringExtra(DOWNLOAD_URL)));
             // salva itens no BD
