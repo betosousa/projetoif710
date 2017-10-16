@@ -51,12 +51,6 @@ public class PodcastPlayer extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        /*
-        fileUri = intent.getStringExtra(FILE_URI);
-        title = intent.getStringExtra(TITLE);
-        podcastID = Integer.parseInt(intent.getStringExtra(PODCAST_ID));
-        */
-
         podcast = (ItemFeed) intent.getSerializableExtra(PODCAST);
         mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(podcast.getFileURI()));
 
@@ -96,23 +90,28 @@ public class PodcastPlayer extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (mediaPlayer != null) {
+            // reupera posicao atual
             int playedMsec = mediaPlayer.getCurrentPosition();
             mediaPlayer.stop();
             mediaPlayer.release();
+            // salva no bd
             PodcastProviderHelper.updatePlayedMsec(getApplicationContext(), podcast.getId(), playedMsec);
         }
     }
 
     public void play() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+            // inicializa de onde parou
             mediaPlayer.seekTo(podcast.getPlayedMsec());
         }
     }
 
     public void pause(){
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            // reupera posicao atual
             int playedMsec = mediaPlayer.getCurrentPosition();
             mediaPlayer.pause();
+            // salva no bd
             PodcastProviderHelper.updatePlayedMsec(getApplicationContext(), podcast.getId(), playedMsec);
         }
     }

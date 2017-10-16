@@ -133,6 +133,7 @@ public class MainActivity extends Activity {
                 atualizaLista(itemFeeds);
                 Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
             } else {
+                // se ainda nao fez o primeiro download ...
                 Intent intent = new Intent(getApplicationContext(), ItensDownloadIntentService.class);
                 intent.putExtra(ItensDownloadIntentService.DOWNLOAD_URL, RSS_FEED);
                 startService(intent);

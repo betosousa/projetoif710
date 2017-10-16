@@ -142,7 +142,7 @@ public class PodcastProviderHelper {
 
     public static void updatePlayedMsec(Context context, int podcastID, int playedMsec){
         ContentValues contentValues = new ContentValues();
-        // salva a URI do podcast
+        // salva posicao atual do podcast
         contentValues.put(PodcastProviderContract.PLAYED_MSEC, playedMsec);
         // realiza uma query de update no podcast de id passado como argumento
         int x = context.getContentResolver().update(
