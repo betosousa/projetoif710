@@ -144,9 +144,8 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
     void playAction(ItemFeed itemFeed) {
         // cria intent para abrir activity que reproduzira o podcast
         Intent activityIntent = new Intent(getContext(), PlayActivity.class);
-        // passa o titulo e a uri no intent
-        activityIntent.putExtra(PlayActivity.TITLE, itemFeed.getTitle());
-        activityIntent.putExtra(PlayActivity.FILE_URI, itemFeed.getFileURI());
+        // passa o podcast
+        activityIntent.putExtra(PlayActivity.PODCAST, itemFeed);
         // inicia a activity
         getContext().startActivity(activityIntent);
     }

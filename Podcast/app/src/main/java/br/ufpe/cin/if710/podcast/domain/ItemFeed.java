@@ -11,6 +11,7 @@ public class ItemFeed implements Serializable {
     private final String downloadLink;
     private long downloadID;
     private String fileURI;
+    private int playedMsec;
 
 
     public ItemFeed(int id, String title, String link, String pubDate, String description, String downloadLink) {
@@ -74,5 +75,13 @@ public class ItemFeed implements Serializable {
 
     public void setFileURI(String fileURI) {
         this.fileURI = fileURI;
+    }
+
+    public int getPlayedMsec() {
+        return playedMsec;
+    }
+
+    public void setPlayedMsec(int playedMsec) {
+        this.playedMsec = playedMsec;
     }
 }

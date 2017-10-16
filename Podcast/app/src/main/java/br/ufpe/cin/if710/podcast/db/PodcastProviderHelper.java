@@ -40,6 +40,10 @@ public class PodcastProviderHelper {
                 if(fileURI != null){
                     itemFeed.setFileURI(fileURI);
                 }
+                Integer playedMsec = c.getInt(c.getColumnIndex(PodcastProviderContract.PLAYED_MSEC));
+                if(playedMsec != null){
+                    itemFeed.setPlayedMsec(playedMsec);
+                }
                 // ... e adiciona na lista a ser retornada
                 lista.add(itemFeed);
             }
@@ -89,6 +93,10 @@ public class PodcastProviderHelper {
                     itemFeed.setFileURI(fileURI);
                     Log.d("FILE_URI", fileURI);
                 }
+                Integer playedMsec = c.getInt(c.getColumnIndex(PodcastProviderContract.PLAYED_MSEC));
+                if(playedMsec != null){
+                    itemFeed.setPlayedMsec(playedMsec);
+                }
             }
             c.close();
         }
@@ -130,5 +138,20 @@ public class PodcastProviderHelper {
     // metodo para validar strings e evitar insercoes de campos nulos no BD
     private static String getValidString(String str) {
         return str != null ? str : "";
+    }
+
+    public static void updatePlayedMsec(Context context, int podcastID, int playedMsec){
+        ContentValues contentValues = new ContentValues();
+        // salva a URI do podcast
+        contentValues.put(PodcastProviderContract.PLAYED_MSEC, playedMsec);
+        // realiza uma query de update no podcast de id passado como argumento
+        int x = context.getContentResolver().update(
+                PodcastProviderContract.EPISODE_LIST_URI,
+                contentValues,
+                PodcastProviderContract._ID+"=?",
+                new String[]{String.valueOf(podcastID)}
+        );
+
+        Log.d("PLAYED_MSEC", " updated "+x);
     }
 }

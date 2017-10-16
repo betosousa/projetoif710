@@ -18,7 +18,7 @@ public class SettingsActivity extends Activity {
     public static final String FEED_LINK = "feedlink";
     public static final String UPDATE_TIME = "updateTime";
     public static final int JOB_ID = 710;
-    private static final long MINUTES_MILISECS = 60 * 1000;
+    private static final long MINUTES_MILISECS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

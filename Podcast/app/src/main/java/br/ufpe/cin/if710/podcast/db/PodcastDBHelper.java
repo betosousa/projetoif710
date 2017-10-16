@@ -32,11 +32,12 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
     public final static String EPISODE_DOWNLOAD_LINK = "downloadLink";
     public final static String EPISODE_FILE_URI = "downloadUri";
     public final static String EPISODE_DOWNLOAD_ID = "downloadID";
+    public final static String EPISODE_PLAYED_MSEC = "playedMsec";
 
     public final static String[] columns = {
             _ID, EPISODE_TITLE, EPISODE_DATE, EPISODE_LINK,
             EPISODE_DESC, EPISODE_DOWNLOAD_LINK, EPISODE_FILE_URI,
-            EPISODE_DOWNLOAD_ID
+            EPISODE_DOWNLOAD_ID, EPISODE_PLAYED_MSEC
     };
     final private static String CREATE_CMD =
             "CREATE TABLE "+DATABASE_TABLE+" (" + _ID
@@ -47,7 +48,8 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     + EPISODE_DESC + " TEXT NOT NULL, "
                     + EPISODE_DOWNLOAD_LINK + " TEXT NOT NULL, "
                     + EPISODE_FILE_URI + " TEXT NOT NULL,"
-                    + EPISODE_DOWNLOAD_ID + " LONG NULL"
+                    + EPISODE_DOWNLOAD_ID + " LONG NULL,"
+                    + EPISODE_PLAYED_MSEC + " INTEGER NULL"
                     + ")";
 
 

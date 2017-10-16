@@ -129,8 +129,14 @@ public class MainActivity extends Activity {
         }
         @Override
         protected void onPostExecute(List<ItemFeed> itemFeeds) {
-            atualizaLista(itemFeeds);
-            Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
+            if(!itemFeeds.isEmpty()) {
+                atualizaLista(itemFeeds);
+                Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(getApplicationContext(), ItensDownloadIntentService.class);
+                intent.putExtra(ItensDownloadIntentService.DOWNLOAD_URL, RSS_FEED);
+                startService(intent);
+            }
         }
     }
 

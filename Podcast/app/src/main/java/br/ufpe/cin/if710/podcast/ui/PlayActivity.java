@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.player.PodcastPlayer;
 
 /**
@@ -19,12 +20,9 @@ import br.ufpe.cin.if710.podcast.player.PodcastPlayer;
 
 public class PlayActivity extends Activity {
 
-    public static final String FILE_URI = PodcastPlayer.FILE_URI;
-    public static final String TITLE = "title";
+    public static final String PODCAST = PodcastPlayer.PODCAST;
 
-    private String title;
-    private String fileURI;
-
+    private ItemFeed podcast;
     private PodcastPlayer podcastPlayer;
     private boolean isBound;
 
@@ -32,9 +30,7 @@ public class PlayActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-
-        fileURI = getIntent().getStringExtra(FILE_URI);
-        title = getIntent().getStringExtra(TITLE);
+        podcast = (ItemFeed) getIntent().getSerializableExtra(PODCAST);
 
         // cria intent para chamar o service
         Intent serviceIntent = new Intent(getApplicationContext(), PodcastPlayer.class);
@@ -43,7 +39,7 @@ public class PlayActivity extends Activity {
         startService(serviceIntent);
 
         // coloca o titulo do podcast na tela
-        ((TextView) findViewById(R.id.playtitle)).setText(title);
+        ((TextView) findViewById(R.id.playtitle)).setText(podcast.getTitle());
 
         // define os botoes da tela para reproduzir e pausar o podcast com chamadas ao service
         ((Button) findViewById(R.id.play)).setOnClickListener(new View.OnClickListener() {
@@ -87,9 +83,8 @@ public class PlayActivity extends Activity {
         if(!isBound){
             // cria intent para realizar bind com service
             Intent bindIntent = new Intent(getApplicationContext(), PodcastPlayer.class);
-            // passa titulo e a uri do arquivo baixado
-            bindIntent.putExtra(FILE_URI, fileURI);
-            bindIntent.putExtra(TITLE, title);
+            // passa podcast a ser reproduzido pelo service
+            bindIntent.putExtra(PODCAST, podcast);
             // realiza bind com service
             isBound = bindService(bindIntent, serviceConnection, BIND_AUTO_CREATE);
         }
