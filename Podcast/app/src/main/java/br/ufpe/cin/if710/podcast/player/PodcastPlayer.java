@@ -10,6 +10,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.File;
+import java.net.URI;
+
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
@@ -56,12 +59,24 @@ public class PodcastPlayer extends Service {
 
         criaNotificacao();
 
-        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+        // listener que verifica final do podcast
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onSeekComplete(MediaPlayer mp) {
-                mp.start();
+            public void onCompletion(MediaPlayer mp) {
+                File file = new File(URI.create(podcast.getFileURI()).getPath());
+                file.delete();
+                PodcastProviderHelper.updateFileURI(getApplicationContext(),podcast.getId(),"");
+                PodcastProviderHelper.updateDownloadID(getApplicationContext(),podcast.getId(),0);
+                Log.d("DELETE", "onCompletion: ");
+                stopSelf();
             }
         });
+
+        // inicializa de onde parou
+        mediaPlayer.seekTo(podcast.getPlayedMsec());
+
+        // testando item 15
+        //mediaPlayer.seekTo(mediaPlayer.getDuration()-5000);
 
         return podcastBinder;
     }
@@ -101,8 +116,7 @@ public class PodcastPlayer extends Service {
 
     public void play() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
-            // inicializa de onde parou
-            mediaPlayer.seekTo(podcast.getPlayedMsec());
+            mediaPlayer.start();
         }
     }
 
