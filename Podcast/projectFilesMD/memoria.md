@@ -8,4 +8,4 @@ Pelo que se pode perceber, o aplicativo usa em média 13 MB de memória, quando 
 
 Ao acessar a activity que disponibiliza as informações do episódio do podcast (EpisodeDetailActivity), não há modificações significantes no uso da memória. Porém ao retornar a MainActivity, há um leve incremento no uso da memória, possivelmente explicado pelo carregamento desta junto a remoção da EpisodeDetailActivity previamente carregada.
 
-Este mesmo comportamento é visto também no PlayActivity, que é uma activity chamada quando o usuário deseja reproduzir o episódio baixado.
+Este mesmo comportamento é visto também no PlayActivity, que é uma activity chamada quando o usuário deseja reproduzir o episódio baixado. O service presente nesta acitivity responsável pela reprodução do áudio não apresenta significativas variações no uso da memória.
