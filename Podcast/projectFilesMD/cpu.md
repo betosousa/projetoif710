@@ -1,6 +1,22 @@
 # CPU & Performance
 
-## Ação Download
+A análise dos testes foi realizada com um emulador do Nexus 4 utilizando a API 25. Dividimos a avaliação de CPU e Performance em ações que representam os pricipais usos do app.
+
+## Abrir App
+
+[//]:<> (TODO)
+
+## Atualizar Lista de Podcasts
+
+[//]:<> (inclui configurar o jobscheduler)
+
+[//]:<> (TODO)
+
+## Reproduzir Podcast
+
+[//]:<> (TODO)
+
+## Download de Episódio
 
 ### Analise
 
