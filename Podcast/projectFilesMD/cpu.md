@@ -8,9 +8,17 @@ A análise dos testes foi realizada com um emulador do Nexus 4 utilizando a API 
 
 Pelo que se pode perceber, o app registrou um pico de consumo de 39% da CPU durante o processo de primeira inicialização do app, momento este em que é realizado o primeiro download da lista de podcast.
 
-<img src="D:/10p/android/exercicio-podcast/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp" width="102" height="102">
-<img src="Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp2" width="102" height="102">
-<img src="Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp2" width="102" height="102">
+ts1
+<img src="D:/10p/android/exercicio-podcast/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp1" width="102" height="102">
+
+ts2
+![Alt cpuAbrirApp2] (/Imgs/cpuAbrirApp.png)
+
+ts3
+![Alt cpuAbrirApp3] (Imgs/cpuAbrirApp.png)
+
+ts4
+<img src="Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp4" width="102" height="102">
 Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos metodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
 
 [    imagem  mTraceAbrirAppInsert    ]:<> 
