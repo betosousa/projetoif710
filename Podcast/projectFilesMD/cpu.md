@@ -8,22 +8,13 @@ A análise dos testes foi realizada com um emulador do Nexus 4 utilizando a API 
 
 Pelo que se pode perceber, o app registrou um pico de consumo de 39% da CPU durante o processo de primeira inicialização do app, momento este em que é realizado o primeiro download da lista de podcast.
 
-ts1
-<img src="D:/10p/android/exercicio-podcast/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp1" width="102" height="102">
+![Alt cpuAbrirApp](Imgs/cpuAbrirApp.png)
 
-ts2
-![Alt cpuAbrirApp2](/Imgs/cpuAbrirApp.png)
-
-ts3
-![Alt cpuAbrirApp3](Imgs/cpuAbrirApp.png)
-
-ts4
-<img src="Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp4" width="102" height="102">
 Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos metodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
 
-[    imagem  mTraceAbrirAppInsert    ]:<> 
+![Alt mTraceAbrirAppInsert](Imgs/mTraceAbrirAppInsert.png 'method trace da inseção da lista no bd')
 
-[    imagem  mTraceAbrirAppRead    ]:<> 
+![Alt mTraceAbrirAppRead](Imgs/mTraceAbrirAppRead.png 'method trace do download do xml')
 
 Na inserção da lista, o content provider é chamado para cada item separadamente, o que pode ser melhorado com um bulkInsert.
 
@@ -90,9 +81,6 @@ Para melhorar a performance de download, utilizamos o Download Manager ...
 
 [    imagem  mTraceAbrirAppReadCorrigido    ]:<> 
 
-## Reproduzir Podcast
-
-[//]:<> (TODO)
 
 ## Download de Episódio
 
@@ -131,3 +119,7 @@ public class DownloadIntentService extends IntentService {
 }
 
 ```
+
+## Reproduzir Podcast
+
+[//]:<> (TODO)
