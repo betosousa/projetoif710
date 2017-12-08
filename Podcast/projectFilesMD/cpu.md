@@ -47,7 +47,7 @@ Na inserção da lista, o content provider é chamado para cada item separadamen
 
 
 
-No download do xml, é estabelecida uma conexão com a url salva e a leitura dos bytes recebidos é feita atraves de um InputStream recuperado pela conexão. Uma possível melhora é utilizar o Download Manager para esta tarefa.
+No download do xml, é estabelecida uma conexão com a url salva e a leitura dos bytes recebidos é feita através de um InputStream recuperado pela conexão. Uma possível melhora é utilizar o Download Manager para esta tarefa.
 
 ```java
 
@@ -90,11 +90,20 @@ Para melhorar a performance de download, utilizamos o Download Manager ...
 
 ## Download de Episódio
 
-### Analise
+### Análise
 
-Pelo que se pode perceber, o app registrou um pico de consumo de 12% da CPU no instante em que recebe o comando de download de um episódio. Por mais que vários downloads sejam socilitados simultaneamente, o consumo da CPU permanece nessa faixa de 12%.
+Pelo que se pode perceber, o app registrou um pico de consumo de 20% da CPU no instante em que recebe o comando de download de um episódio. Por mais que vários downloads sejam socilitados simultaneamente, o consumo da CPU se manteve numa média de 20% com pico de 33%.
 
-[//]:<> (add img profile cpu)
+Único download:
+
+![Alt cpuDownload](Imgs/cpuDownload.png)
+
+
+Download múltiplo:
+
+![Alt cpuMultiDownload](Imgs/cpuMultiDownload.png)
+
+
 
 ### Justificativa
 
@@ -161,7 +170,21 @@ Nesta activity ocorre a criação e o bind do service que reproduzirá a mídia.
         isBound = bindService(bindIntent, serviceConnection, BIND_AUTO_CREATE);
 ```
 
-Dessa forma o processamento da reprodução é feito pelo service e com isso é possível sair da activity sem parar a reprodução e assim, o profiler registra 0% de uso da CPU pelo app e em média 20% como sendo de outros (isto ocorre enquanto o podcast está sendo tocado pelo mediaPlayer).
+Neste service, o processamento da reprodução é feito pelo mediaPlayer. 
+
+```java
+
+public IBinder onBind(Intent intent) {
+        podcast = (ItemFeed) intent.getSerializableExtra(PODCAST);
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(podcast.getFileURI()));
+        [...]
+        // inicializa de onde parou
+        mediaPlayer.seekTo(podcast.getPlayedMsec());
+        [...]
+
+```
+
+Com isso é possível sair da activity sem parar a reprodução e assim, o profiler registra 0% de uso da CPU pelo app e em média 20% como sendo de outros (enquanto o podcast está sendo tocado pelo mediaPlayer).
 
 ![Alt cpuReproduzir](Imgs/cpuReproduzir.PNG)
 
