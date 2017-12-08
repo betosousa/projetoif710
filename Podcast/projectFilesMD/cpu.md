@@ -4,12 +4,13 @@ A análise dos testes foi realizada com um emulador do Nexus 4 utilizando a API 
 
 ## Primeira inicialização do App
 
-### Analise
+### Análise
 
 Pelo que se pode perceber, o app registrou um pico de consumo de 39% da CPU durante o processo de primeira inicialização do app, momento este em que é realizado o primeiro download da lista de podcast.
 
-[    imagem  cpuAbrirApp    ]:<> 
-![alt text] (https://github.com/betosousa/exercicio-podcast/tree/master/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png)
+![Alt cpuAbrirApp] (/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png)
+
+![Alt cpuAbrirApp2] (Podcast/projectFilesMD/Imgs/cpuAbrirApp.png)
 
 Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos metodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
 
