@@ -10,11 +10,16 @@ Pelo que se pode perceber, o app registrou um pico de consumo de 39% da CPU dura
 
 ![Alt cpuAbrirApp](Imgs/cpuAbrirApp.png)
 
-Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos metodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
+
+Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos métodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
 
 ![Alt mTraceAbrirAppInsert](Imgs/mTraceAbrirAppInsert.png 'method trace da inseção da lista no bd')
 
+
 ![Alt mTraceAbrirAppRead](Imgs/mTraceAbrirAppRead.png 'method trace do download do xml')
+
+
+
 
 Na inserção da lista, o content provider é chamado para cada item separadamente, o que pode ser melhorado com um bulkInsert.
 
@@ -39,6 +44,7 @@ Na inserção da lista, o content provider é chamado para cada item separadamen
 
 
 ```
+
 
 
 No download do xml, é estabelecida uma conexão com a url salva e a leitura dos bytes recebidos é feita atraves de um InputStream recuperado pela conexão. Uma possível melhora é utilizar o Download Manager para esta tarefa.
@@ -122,4 +128,43 @@ public class DownloadIntentService extends IntentService {
 
 ## Reproduzir Podcast
 
-[//]:<> (TODO)
+### Análise
+
+Durante a ação de reprodução do episódio, percebemos um pico de uso de 20% da cpu pelo app para abrir a activity reponsável pela reprodução do episódio. 
+
+
+![Alt cpuReproduzirActivity](Imgs/cpuReproduzirActivity.png)
+
+
+
+
+### Justificativa
+
+Nesta activity ocorre a criação e o bind do service que reproduzirá a mídia. 
+
+```java
+
+        // cria intent para chamar o service
+        Intent serviceIntent = new Intent(getApplicationContext(), PodcastPlayer.class);
+        // inicia o service para reproduzir o podcast
+        startService(serviceIntent);
+
+```
+
+```java
+
+        // cria intent para realizar bind com service
+        Intent bindIntent = new Intent(getApplicationContext(), PodcastPlayer.class);
+        // passa podcast a ser reproduzido pelo service
+        bindIntent.putExtra(PODCAST, podcast);
+        // realiza bind com service
+        isBound = bindService(bindIntent, serviceConnection, BIND_AUTO_CREATE);
+```
+
+Dessa forma o processamento da reprodução é feito pelo service e com isso é possível sair da activity sem parar a reprodução e assim, o profiler registra 0% de uso da CPU pelo app e em média 20% como sendo de outros (isto ocorre enquanto o podcast está sendo tocado pelo mediaPlayer).
+
+![Alt cpuReproduzir](Imgs/cpuReproduzir.png)
+
+
+
+
