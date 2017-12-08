@@ -12,10 +12,10 @@ ts1
 <img src="D:/10p/android/exercicio-podcast/Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp1" width="102" height="102">
 
 ts2
-![Alt cpuAbrirApp2] (/Imgs/cpuAbrirApp.png)
+![Alt cpuAbrirApp2](/Imgs/cpuAbrirApp.png)
 
 ts3
-![Alt cpuAbrirApp3] (Imgs/cpuAbrirApp.png)
+![Alt cpuAbrirApp3](Imgs/cpuAbrirApp.png)
 
 ts4
 <img src="Podcast/projectFilesMD/Imgs/cpuAbrirApp.png" alt="cpuAbrirApp4" width="102" height="102">
