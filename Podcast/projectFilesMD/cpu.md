@@ -13,10 +13,10 @@ Pelo que se pode perceber, o app registrou um pico de consumo de 39% da CPU dura
 
 Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu ocorre nos métodos de inserção da lista no BD e de download do arquivo xml recebido pela internet.
 
-![Alt mTraceAbrirAppInsert](Imgs/mTraceAbrirAppInsert.png 'method trace da inseção da lista no bd')
+![Alt mTraceAbrirAppInsert](Imgs/mTraceAbrirAppInsert.PNG 'method trace da inseção da lista no bd')
 
 
-![Alt mTraceAbrirAppRead](Imgs/mTraceAbrirAppRead.png 'method trace do download do xml')
+![Alt mTraceAbrirAppRead](Imgs/mTraceAbrirAppRead.PNG 'method trace do download do xml')
 
 
 
@@ -163,7 +163,7 @@ Nesta activity ocorre a criação e o bind do service que reproduzirá a mídia.
 
 Dessa forma o processamento da reprodução é feito pelo service e com isso é possível sair da activity sem parar a reprodução e assim, o profiler registra 0% de uso da CPU pelo app e em média 20% como sendo de outros (isto ocorre enquanto o podcast está sendo tocado pelo mediaPlayer).
 
-![Alt cpuReproduzir](Imgs/cpuReproduzir.png)
+![Alt cpuReproduzir](Imgs/cpuReproduzir.PNG)
 
 
 
