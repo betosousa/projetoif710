@@ -1,51 +1,51 @@
-# Testes
+package br.ufpe.cin.if710.podcast.db;
 
-Os testes foram especificados antes da refatorção para uso de Room e Architecture components.
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
-## Unitários (JUnit)
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-Nesta etapa, iremos definir uma suite de testes para as operações de CRUD de ItemFeed, principal classe do modelo e que representa um podcast salvo no app.
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-### beforeClass()
+import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 
-Neste método colocamos tudo que fosse necessário em comum a todos os testes.
+import static org.junit.Assert.assertEquals;
 
-```java
+/**
+ * Created by Beto on 09/12/2017.
+ */
+@RunWith(AndroidJUnit4.class)
+public class JUnitTestSuite {
+
+    static Context context;
+
+
+
+    int itensTotal;
 
     @BeforeClass
     public static void beforeClass() {
-        // recupera o contexto do app 
+        // recupera o contexto do app
         context = InstrumentationRegistry.getTargetContext();
-        
+
         List<ItemFeed> listaItens = new ArrayList<>();
         Date data = new Date();
         listaItens.add(new ItemFeed(1, "titulo", "link Podcast", data.toString(), "descricao", "download url"));
         // salva um item no bd inicialmente
         PodcastProviderHelper.saveItens(context, listaItens);
     }
-```
-
-### beforeTests()
-
-Neste método atualizamos tudo que precisa ser inicializado antes de cada teste
-
-```java
 
     @Before
     public void beforeTests() {
         // antes de cada teste atualiza o total de itens salvo no bd
         itensTotal = PodcastProviderHelper.getItens(context).size();
     }
-```
-
-### afterTest
-### afterClass
-
-### Inserção
-
-Aqui testamos a inserção de um item no bd. Para validar, comparamos o total de itens salvos após a operação com o a quantidade antes do teste somada ao total inserido.
-
-```java
 
     @Test
     public void insertTest() {
@@ -56,20 +56,11 @@ Aqui testamos a inserção de um item no bd. Para validar, comparamos o total de
         List<ItemFeed> lista = new ArrayList<>();
         lista.add(itemFeed);
         PodcastProviderHelper.saveItens(context, lista);
-        
+
         // testa se a quantitade de itens salvos corresponde ao esperado
         assertEquals(lista.size() + itensTotal, PodcastProviderHelper.getItens(context).size());
     }
-```
-### Busca
-### Atualização
-### Remoção
-
-## Integração (UI - Espresso)
 
 
-###### Rascunho inicial
 
--> CRUD itens feed no BD (junit ou intermediario);
-
--> acrescentar ajustes depois do crash de varios downloads simultaneos.
+}
