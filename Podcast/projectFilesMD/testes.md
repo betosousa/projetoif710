@@ -77,6 +77,25 @@ Aqui testamos a inserção de um item no bd. Para validar, comparamos o total de
     }
 ```
 
+#### Correções
+
+Após a execução desse teste, percebemos que o método PodcastProviderHelper.getItens estava incorreto, pois o cursor obtido do provider era percorrido num laço do tipo
+
+```java
+while (c.moveToNext()){
+    [...]
+}
+```
+O que excluia o primeiro item da lista recuperada. Com isso, o método foi corrigido para utilizar o laço
+
+```java
+if (c.getCount() > 0) {
+    do{
+        [...]
+    } while (c.moveToNext());
+}
+```
+
 ### Busca
 
 Aqui testamos a busca de um item no bd. Como possuímos dois métodos para recuperar os itens salvos, criamos dois testes. 

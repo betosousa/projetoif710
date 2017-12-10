@@ -22,30 +22,32 @@ public class PodcastProviderHelper {
         Cursor c = context.getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,null,null,null,null);
         if (c != null) {
             c.moveToFirst();
-            while (c.moveToNext()) {
-                // para cada linha do cursor cria um objeto ItemFeed ...
-                ItemFeed itemFeed = new ItemFeed(
-                                c.getInt(c.getColumnIndex(PodcastProviderContract._ID)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
-                                c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
-                        );
-                Long downloadID = c.getLong(c.getColumnIndex(PodcastProviderContract.EPISODE_DOWNLOAD_ID));
-                if(downloadID != null){
-                    itemFeed.setDownloadID(downloadID);
-                }
-                String fileURI = c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_URI));
-                if(fileURI != null){
-                    itemFeed.setFileURI(fileURI);
-                }
-                Integer playedMsec = c.getInt(c.getColumnIndex(PodcastProviderContract.PLAYED_MSEC));
-                if(playedMsec != null){
-                    itemFeed.setPlayedMsec(playedMsec);
-                }
-                // ... e adiciona na lista a ser retornada
-                lista.add(itemFeed);
+            if (c.getCount() > 0) {
+                do {
+                    // para cada linha do cursor cria um objeto ItemFeed ...
+                    ItemFeed itemFeed = new ItemFeed(
+                            c.getInt(c.getColumnIndex(PodcastProviderContract._ID)),
+                            c.getString(c.getColumnIndex(PodcastProviderContract.TITLE)),
+                            c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_LINK)),
+                            c.getString(c.getColumnIndex(PodcastProviderContract.DATE)),
+                            c.getString(c.getColumnIndex(PodcastProviderContract.DESCRIPTION)),
+                            c.getString(c.getColumnIndex(PodcastProviderContract.DOWNLOAD_LINK))
+                    );
+                    Long downloadID = c.getLong(c.getColumnIndex(PodcastProviderContract.EPISODE_DOWNLOAD_ID));
+                    if (downloadID != null) {
+                        itemFeed.setDownloadID(downloadID);
+                    }
+                    String fileURI = c.getString(c.getColumnIndex(PodcastProviderContract.EPISODE_URI));
+                    if (fileURI != null) {
+                        itemFeed.setFileURI(fileURI);
+                    }
+                    Integer playedMsec = c.getInt(c.getColumnIndex(PodcastProviderContract.PLAYED_MSEC));
+                    if (playedMsec != null) {
+                        itemFeed.setPlayedMsec(playedMsec);
+                    }
+                    // ... e adiciona na lista a ser retornada
+                    lista.add(itemFeed);
+                } while (c.moveToNext());
             }
             c.close();
         }
