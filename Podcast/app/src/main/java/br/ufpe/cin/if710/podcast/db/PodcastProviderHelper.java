@@ -121,7 +121,9 @@ public class PodcastProviderHelper {
     }
 
     public static void saveItens(Context context, List<ItemFeed> itemList){
-        for (ItemFeed itemFeed : itemList) {
+        ContentValues[] valuesArray = new ContentValues[itemList.size()];
+        for (int i = 0; i < itemList.size(); i++) {
+            ItemFeed itemFeed = itemList.get(i);
             ContentValues values = new ContentValues();
             // preenche um ContentValues com os dados recuperados no parser
             values.put(PodcastProviderContract.DATE, getValidString(itemFeed.getPubDate()));
@@ -131,9 +133,14 @@ public class PodcastProviderHelper {
             values.put(PodcastProviderContract.TITLE, getValidString(itemFeed.getTitle()));
             // como o ep ainda nao foi baixado...
             values.put(PodcastProviderContract.EPISODE_URI, "");
-
+            valuesArray[i] = values;
+        }
+        if(itemList.size() > 1){
+            // salva os itens no BD atraves de chamada ao Content Provider
+            context.getContentResolver().bulkInsert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray);
+        }else{
             // salva o item no BD atraves de chamada ao Content Provider
-            Uri uri = context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
+            Uri uri = context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray[0]);
         }
     }
 

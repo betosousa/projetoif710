@@ -3,6 +3,7 @@ package br.ufpe.cin.if710.podcast.db;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
@@ -29,6 +30,32 @@ public class PodcastProvider extends ContentProvider {
         // at the given URI.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] valuesArray){
+        int total = 0;
+        if(isEpisodeTableUri(uri)) {
+            // recupera o bd para insercao
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            // inicia a transacao do bulkInsert
+            db.beginTransaction();
+            try {
+                // itera sobre o array de ContentValues realizando os inserts e atualizando o total inserido
+                for (ContentValues value : valuesArray) {
+                    db.insert(PodcastDBHelper.DATABASE_TABLE, null, value);
+                    total++;
+                }
+                // se tudo der certo...
+                db.setTransactionSuccessful();
+            } finally {
+                // se algo der errado, finaliza a transacao
+                db.endTransaction();
+            }
+        }
+        // retorna o total de linhas inseridas
+        return total;
+    }
+
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
