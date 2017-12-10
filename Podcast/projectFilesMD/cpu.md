@@ -19,7 +19,7 @@ Ao analisar o method trace dessa ação, percebe-se que o maior consumo da cpu o
 ![Alt mTraceAbrirAppRead](Imgs/mTraceAbrirAppRead.PNG 'method trace do download do xml')
 
 
-
+### Justificativa
 
 Na inserção da lista, o content provider é chamado para cada item separadamente, o que pode ser melhorado com um bulkInsert.
 
@@ -47,7 +47,7 @@ Na inserção da lista, o content provider é chamado para cada item separadamen
 
 
 
-No download do xml, é estabelecida uma conexão com a url salva e a leitura dos bytes recebidos é feita através de um InputStream recuperado pela conexão. Uma possível melhora é utilizar o Download Manager para esta tarefa.
+No download do xml, é estabelecida uma conexão com a url salva e a leitura dos bytes recebidos é feita através de um InputStream recuperado pela conexão. 
 
 ```java
 
@@ -76,17 +76,67 @@ No download do xml, é estabelecida uma conexão com a url salva e a leitura dos
 ```
 
 
-### Correções
+### Correção
 
-Para melhorar essa performance de inserção, utilizamos o bulk insert ...
+Para melhorar essa performance de inserção, utilizamos o bulk insert. Assim, criamos um método novo na classe PodcastProvider (classe que extende ContentProvider) para realizar o bulk insert.
 
-[    imagem  mTraceAbrirAppInsertCorrigido    ]:<> 
+```java
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] valuesArray){
+        int total = 0;
+        if(isEpisodeTableUri(uri)) {
+            // recupera o bd para insercao
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            // inicia a transacao do bulkInsert
+            db.beginTransaction();
+            try {
+                // itera sobre o array de ContentValues realizando os inserts e atualizando o total inserido
+                for (ContentValues value : valuesArray) {
+                    db.insert(PodcastDBHelper.DATABASE_TABLE, null, value);
+                    total++;
+                }
+                // se tudo der certo...
+                db.setTransactionSuccessful();
+            } finally {
+                // se algo der errado, finaliza a transacao
+                db.endTransaction();
+            }
+        }
+        // retorna o total de linhas inseridas
+        return total;
+    }
+```
+
+Com isso, adaptamos o método PodcastProviderHelper.saveItens(Context context, List<ItemFeed> itemList) para chamar o bulk insert caso a lista passada tenha mais de 1 elemento.
+
+```java
 
 
-Para melhorar a performance de download, utilizamos o Download Manager ...
-
-[    imagem  mTraceAbrirAppReadCorrigido    ]:<> 
-
+    public static void saveItens(Context context, List<ItemFeed> itemList) {
+        ContentValues[] valuesArray = new ContentValues[itemList.size()];
+        for (int i = 0; i < itemList.size(); i++) {
+            ItemFeed itemFeed = itemList.get(i);
+            ContentValues values = new ContentValues();
+            // preenche um ContentValues com os dados recuperados no parser
+            values.put(PodcastProviderContract.DATE, getValidString(itemFeed.getPubDate()));
+            values.put(PodcastProviderContract.DESCRIPTION, getValidString(itemFeed.getDescription()));
+            values.put(PodcastProviderContract.DOWNLOAD_LINK, getValidString(itemFeed.getDownloadLink()));
+            values.put(PodcastProviderContract.EPISODE_LINK, getValidString(itemFeed.getLink()));
+            values.put(PodcastProviderContract.TITLE, getValidString(itemFeed.getTitle()));
+            // como o ep ainda nao foi baixado...
+            values.put(PodcastProviderContract.EPISODE_URI, "");
+            valuesArray[i] = values;
+        }
+        if (itemList.size() > 1) {
+            // salva os itens no BD atraves de chamada ao Content Provider
+            context.getContentResolver().bulkInsert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray);
+        } else {
+            // salva o item no BD atraves de chamada ao Content Provider
+            Uri uri = context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray[0]);
+        }
+    }
+```
 
 ## Download de Episódio
 

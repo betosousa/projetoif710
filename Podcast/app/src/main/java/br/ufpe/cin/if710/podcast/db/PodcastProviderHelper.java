@@ -120,7 +120,7 @@ public class PodcastProviderHelper {
         Log.d("DOWNLOAD_RECEIVER", " updated "+x);
     }
 
-    public static void saveItens(Context context, List<ItemFeed> itemList){
+    public static void saveItens(Context context, List<ItemFeed> itemList) {
         ContentValues[] valuesArray = new ContentValues[itemList.size()];
         for (int i = 0; i < itemList.size(); i++) {
             ItemFeed itemFeed = itemList.get(i);
@@ -135,10 +135,10 @@ public class PodcastProviderHelper {
             values.put(PodcastProviderContract.EPISODE_URI, "");
             valuesArray[i] = values;
         }
-        if(itemList.size() > 1){
+        if (itemList.size() > 1) {
             // salva os itens no BD atraves de chamada ao Content Provider
             context.getContentResolver().bulkInsert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray);
-        }else{
+        } else {
             // salva o item no BD atraves de chamada ao Content Provider
             Uri uri = context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, valuesArray[0]);
         }
