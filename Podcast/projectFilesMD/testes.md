@@ -293,7 +293,7 @@ As ações escolhidas sequencialmente para a nossa suite de testes de integraç�
     textView11.check(matches(withText("Programa 3")));
 ```
 
-4) Retornar a MaiActivity e verificar a existência do botão de download do episódio antes de realizar o download.
+4) Retornar a MainActivity e verificar a existência do botão de download do episódio antes de realizar o download.
 
 ```java
 
