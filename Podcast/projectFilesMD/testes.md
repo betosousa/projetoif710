@@ -169,6 +169,198 @@ Aqui testamos o método PodcastProviderHelper.updatePlayedMsec(Context context, 
 
 ## Integração (UI - Espresso)
 
+Nesta etapa, foi definida uma suíte de testes feita eplo Espresso para avaliar integração e interface. 
+
+### Espresso Test Recorder
+
+Por motivos de facilidade e organização do código de testes gerado, foi utilizado a ferramenta provida pelo Android Studio, o Espresso Test Recorder.
+
+![Alt espresso_option](Imgs/espresso_option.png)
+
+Com esta ferramenta, nos é disponibilizado uma interface que registra as ações realizadas pelo emulador, tais como os cliques e acessos às diferentes componentes presentes no aplicativo, etc. 
+
+### Descrição
+
+Para cada interação feita com o emulador, é possível adicionar *assertions* que verificam se o que é disponibilizado pelo app é condizente com o que é esperado.
+Baseado nas *assertions* definidas, é gerado automaticamente código correspondente aquilo, como pode ser visto abaixo pela imagem descrevendo a interface do Espresso Test Recorder e o código gerado baseado na *assertion* feita.
+
+![Alt espresso_option](Imgs/espresso_assertion.PNG)
+
+```java
+
+    DataInteraction linearLayout = onData(anything())
+            .inAdapterView(allOf(withId(R.id.items),
+                    childAtPosition(
+                            withClassName(is("android.widget.LinearLayout")),
+                            0)))
+            .atPosition(0);
+    linearLayout.perform(click());
+
+    ViewInteraction textView = onView(
+            allOf(withId(R.id.podcastitle), withText("O Homem foi mesmo até a Lua?"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withId(android.R.id.content),
+                                    0),
+                            0),
+                    isDisplayed()));
+    textView.check(matches(withText("O Homem foi mesmo até a Lua?")));
+```
+
+As ações escolhidas sequencialmente para a nossa suite de testes de integração e interface foram (todas os trechos de código abaixo são referentes ao segundo item da lista de podcasts, em que o episódio correspondente é o de *Darwin e a Evolução*):
+
+1) Realizar clique em itens da lista de episódios de podcast.
+
+```java
+
+    DataInteraction linearLayout2 = onData(anything())
+            .inAdapterView(allOf(withId(R.id.items),
+                    childAtPosition(
+                            withClassName(is("android.widget.LinearLayout")),
+                            0)))
+            .atPosition(1);
+    linearLayout2.perform(click());
+```
+
+2) Verificar as informações que são disponibilizadas pelas activities novas carregadas.
+
+```java
+
+    ViewInteraction textView2 = onView(
+            allOf(withId(R.id.podcastitle), withText("Darwin e a Evolução"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withId(android.R.id.content),
+                                    0),
+                            0),
+                    isDisplayed()));
+    textView2.check(matches(withText("Darwin e a Evolução")));
+
+    ViewInteraction textView3 = onView(
+            allOf(withId(R.id.pubDate), withText("Mon, 21 Jun 2010 10:45:05 GMT"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withId(android.R.id.content),
+                                    0),
+                            1),
+                    isDisplayed()));
+    textView3.check(matches(withText("Mon, 21 Jun 2010 10:45:05 GMT")));
+
+    ViewInteraction textView4 = onView(
+            allOf(withId(R.id.description), withText("Programa 3"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withId(android.R.id.content),
+                                    0),
+                            2),
+                    isDisplayed()));
+    textView4.check(matches(withText("Programa 3")));
+```
+
+3) Verificar a existência do botão de download do episódio antes de realizar o download.
+
+```java
+
+    ViewInteraction button = onView(
+            allOf(withId(R.id.item_action),
+                    childAtPosition(
+                            childAtPosition(
+                                    IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                    0),
+                            1),
+                    isDisplayed()));
+    button.check(matches(isDisplayed()));
+
+    ViewInteraction button2 = onView(
+            allOf(withId(R.id.item_action), withText("BAIXAR"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withClassName(is("android.widget.LinearLayout")),
+                                    0),
+                            1),
+                    isDisplayed()));
+    button2.perform(click());
+```
+
+4) Realizar clique, quando o download do episódio é finalizado, em botão que tem seu texto modificado de **BAIXAR** para **REPRODUZIR**.
+
+```java
+
+    ViewInteraction button5 = onView(
+            allOf(withId(R.id.item_action), withText("REPRODUZIR"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withClassName(is("android.widget.LinearLayout")),
+                                    0),
+                            1),
+                    isDisplayed()));
+    button5.perform(click());
+```
+
+5) Verificar informações em nova activity (PlayActivity) carregada do episódio que se deseja reproduzir o aúdio.
+
+```java
+
+    ViewInteraction textView5 = onView(
+            allOf(withId(R.id.playtitle), withText("Darwin e a Evolução"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withId(android.R.id.content),
+                                    0),
+                            0),
+                    isDisplayed()));
+    textView5.check(matches(withText("Darwin e a Evolução")));
+```
+
+6) Verificar a existência dos botões de **PLAY** e **PAUSE** na PlayActivity.
+
+```java
+
+    ViewInteraction button6 = onView(
+            allOf(withId(R.id.play),
+                    childAtPosition(
+                            childAtPosition(
+                                    IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                    1),
+                            0),
+                    isDisplayed()));
+    button6.check(matches(isDisplayed()));
+
+    ViewInteraction button7 = onView(
+            allOf(withId(R.id.pause),
+                    childAtPosition(
+                            childAtPosition(
+                                    IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                    1),
+                            1),
+                    isDisplayed()));
+    button7.check(matches(isDisplayed()));
+```
+
+7) Realizar clique nos botões de **PLAY** e **PAUSE**.
+
+```java
+
+    ViewInteraction button8 = onView(
+            allOf(withId(R.id.play), withText("PLAY"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withClassName(is("android.widget.LinearLayout")),
+                                    1),
+                            0),
+                    isDisplayed()));
+    button8.perform(click());
+
+    ViewInteraction button9 = onView(
+            allOf(withId(R.id.pause), withText("PAUSE"),
+                    childAtPosition(
+                            childAtPosition(
+                                    withClassName(is("android.widget.LinearLayout")),
+                                    1),
+                            1),
+                    isDisplayed()));
+    button9.perform(click());
+```
 
 ###### Rascunho inicial
 

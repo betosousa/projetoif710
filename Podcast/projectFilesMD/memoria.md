@@ -9,7 +9,6 @@ A análise dos testes foi realizada com um emulador do Nexus 4 utilizando a API 
 Pelo que se pode perceber, o aplicativo usou em média 12.5 MB de memória, quando em primeiro plano com a MainActivity. Vide imagem abaixo.
 
 ![Alt memory_main_activity](Imgs/memory_main_activity.PNG)
-[//]: <> (inserir possível imagem)
 
 ### Justificativa
 
@@ -27,7 +26,7 @@ Este comportamento pode ser justificado pelas operações relativas ao banco de 
 ```
 
 
-## App em primeiro plano
+## App em background
 
 ### Análise
 
