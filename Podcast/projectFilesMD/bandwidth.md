@@ -101,6 +101,6 @@ O download individual de podcasts é feita pela classe DownloadIntentService aux
 
 ### Download coletivo
 
-Para avaliar o consumo de rede de download coletivo, foi realizado o download simultâneo dos podcasts: *Objetos Voadores não identificados...* (26.44 MB), *Homeopatia* (18.55 MB), *Astrologia* (26.29 MB) e *Medicina Alternativa* (27.77 MB). Juntamente, seus downloads tiveram picos de 5.87 MB/s, visto na imagem abaixo, levando cerca de 1 minuto e 27 segundos para conclusão.
+Para avaliar o consumo de rede de download coletivo, foi realizado o download simultâneo dos podcasts: *Objetos Voadores não identificados...* (26.44 MB), *Homeopatia* (18.55 MB), *Astrologia* (26.29 MB) e *Medicina Alternativa* (27.77 MB). Juntamente, seus downloads tiveram picos com máximo de 5.87 MB/s, visto na imagem abaixo, levando cerca de 1 minuto e 27 segundos para conclusão.
 
 ![Alt memory_main_activity](Imgs/bandwidth_many.PNG)
