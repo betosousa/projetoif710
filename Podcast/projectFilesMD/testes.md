@@ -421,6 +421,8 @@ As ações escolhidas sequencialmente para a nossa suite de testes de integraç�
 
 ## LeakCanary
 
+### Análise
+
 Como forma adicional para avaliar os tópicos listados como requisitos para o projeto, foi utilizado o LeakCanary para verificar possíveis vazamentos de memória do aplicativo.
 
 Foi seguido o passo a passo do [Github do LeakCanary](https://github.com/square/leakcanary) para acoplá-lo ao aplicativo.
@@ -434,3 +436,7 @@ O aplicativo foi rodado com build *debug* e não foi notado nenhum vazamento de 
 3) Reprodução dos áudios de podcasts.
 
 4) Acesso ao SettingsActivity.
+
+### Justificativa
+
+Uma possível explicação para a ausência de vazamento de memória seria o fato de grande parte das variáveis utilizadas serem locais e aquelas que não são deste tipo submetem-se a verificações que previnem a ocorrência de vazamento.
