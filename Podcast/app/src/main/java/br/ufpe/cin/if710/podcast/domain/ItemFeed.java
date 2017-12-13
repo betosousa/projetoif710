@@ -1,18 +1,32 @@
 package br.ufpe.cin.if710.podcast.domain;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.io.Serializable;
 
+@Entity
 public class ItemFeed implements Serializable {
+    @PrimaryKey
     private final int id;
+    @ColumnInfo
     private final String title;
+    @ColumnInfo
     private final String link;
+    @ColumnInfo
     private final String pubDate;
+    @ColumnInfo
     private final String description;
+    @ColumnInfo
     private final String downloadLink;
+    @ColumnInfo(name = "download_id")
     private long downloadID;
+    @ColumnInfo
     private String fileURI;
+    @ColumnInfo
     private int playedMsec;
-
 
     public ItemFeed(int id, String title, String link, String pubDate, String description, String downloadLink) {
         this.id = id;
@@ -23,6 +37,7 @@ public class ItemFeed implements Serializable {
         this.downloadLink = downloadLink;
     }
 
+    @Ignore
     public ItemFeed(String title, String link, String pubDate, String description, String downloadLink) {
         this.id = -1;
         this.title = title;
