@@ -141,3 +141,9 @@ Dessa forma, podemos reescrever os métodos da classe para utilizar Room com alg
         getDao(context).updateItem(itemFeed);
     }
 ```
+
+## LiveData
+
+### Caso de Uso
+
+Ao analisar a [documentação do LiveDatã](https://developer.android.com/topic/libraries/architecture/livedata.html), para o caso de uso que emprega LiveData, foi definido a possibilidade de aplicar LiveData envolvendo a atualização da lista de podcasts e o JobScheduler. Visto que o LiveData apresenta funcionalidade semelhante ao Padrão de Projeto: *Observer*, isto é, observadores de determinada informação /objeto são atualizados quando este é atualizado, no nosso caso, as *activities* que disponibilizam as informações dos podcasts seriam atualizadas assim que houvesse atualização feita pelo JobScheduler.
