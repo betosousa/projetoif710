@@ -13,6 +13,8 @@ import java.util.List;
 
 public class XmlFeedParser {
 
+    private static int id = 1;
+
     public static List<ItemFeed> parse(String xmlFeed) throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         XmlPullParser xpp = factory.newPullParser();
@@ -88,7 +90,7 @@ public class XmlFeedParser {
                 skip(parser);
             }
         }
-        ItemFeed result = new ItemFeed(title, link, pubDate, description, downloadLink);
+        ItemFeed result = new ItemFeed(id++, title, link, pubDate, description, downloadLink);
         return result;
     }
 

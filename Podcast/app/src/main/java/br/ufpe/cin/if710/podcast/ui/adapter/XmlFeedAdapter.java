@@ -97,7 +97,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         holder.item_date.setText(itemFeed.getPubDate());
 
         // ajusta o texto do botao de acordo com arquivo baixado ou nao
-        if (!itemFeed.getFileURI().isEmpty()) {
+        if (itemFeed.isDownloadComplete()) {
             holder.action_button.setText(context.getString(R.string.reproduzir));
         } else {
             holder.action_button.setText(context.getString(R.string.baixar));
@@ -108,7 +108,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         holder.action_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!itemFeed.getFileURI().isEmpty()) {
+                if (itemFeed.isDownloadComplete()) {
                     playAction(itemFeed);
                 } else {
                     // desativa o botao se ja estiver baixando

@@ -101,7 +101,7 @@ Adaptamos a classe PodcastProviderHelper que concentrava todos os acessos ao Con
 
     private static ItemFeedDao getDao(Context context) {
         if (db == null) {
-            Room.databaseBuilder(context, ItemFeedDB.class, "database-name").build();
+            db = Room.databaseBuilder(context, ItemFeedDB.class, "podcasts").build();
         }
         return db.itemFeedDao();
     }

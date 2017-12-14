@@ -84,6 +84,10 @@ public class ItemFeed implements Serializable {
         return fileURI;
     }
 
+    public boolean isDownloadComplete(){
+        return fileURI != null && !fileURI.isEmpty();
+    }
+
     public void setDownloadID(long downloadID){
         this.downloadID = downloadID;
     }
