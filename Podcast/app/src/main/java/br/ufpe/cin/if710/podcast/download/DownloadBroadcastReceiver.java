@@ -1,19 +1,15 @@
 package br.ufpe.cin.if710.podcast.download;
 
 import android.app.DownloadManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderHelper;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
-import br.ufpe.cin.if710.podcast.ui.MainActivity;
 
 /**
  * Created by Beto on 07/10/2017.
@@ -29,22 +25,53 @@ public class DownloadBroadcastReceiver extends BroadcastReceiver {
 
     private static final int NOTIFICATION_ID = 1;
 
+    long downloadID;
+    Context context;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("DOWNLOAD_RECEIVER", "onreceive");
         Toast.makeText(context, "Download Completo", Toast.LENGTH_SHORT).show();
+        this.context = context;
         // recupera o id do download solicitado
-        long downloadID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+        downloadID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
         // recupera o item correspondente
-        ItemFeed itemFeed = PodcastProviderHelper.getItem(context, downloadID);
+        new GetTask().execute();
+    }
+
+    void update(ItemFeed itemFeed){
         // recupera a uri do arquivo baixado
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         String fileURI = downloadManager.getUriForDownloadedFile(downloadID).toString();
 
         if (itemFeed != null) {
             // atuaiza o item com a uri do arquivo
-            PodcastProviderHelper.updateFileURI(context, itemFeed.getId(), fileURI);
+            itemFeed.setFileURI(fileURI);
+            new UpdateTask().execute(itemFeed);
         }
+
         Log.d("DOWNLOAD_URI", "onReceive: " + fileURI.toString());
+    }
+
+    class GetTask extends AsyncTask<Void, Void, ItemFeed>{
+        @Override
+        protected ItemFeed doInBackground(Void... contexts) {
+            return PodcastProviderHelper.getItem(context, downloadID);
+        }
+
+        @Override
+        protected void onPostExecute(ItemFeed itemFeed) {
+            super.onPostExecute(itemFeed);
+            update(itemFeed);
+        }
+    }
+
+    class UpdateTask extends AsyncTask<ItemFeed, Void, Void>{
+        @Override
+        protected Void doInBackground(ItemFeed... itens) {
+            ItemFeed itemFeed = itens[0];
+            PodcastProviderHelper.updateFileURI(context, itemFeed.getId(), itemFeed.getFileURI());
+            return null;
+        }
     }
 }
