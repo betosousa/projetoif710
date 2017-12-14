@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
@@ -42,6 +44,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this.getApplication());
+
         setContentView(R.layout.activity_main);
 
         items = (ListView) findViewById(R.id.items);
